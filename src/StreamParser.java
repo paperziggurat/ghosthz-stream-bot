@@ -18,7 +18,7 @@ public class StreamParser {
         Scraper scraper = new IceCastScraper();
         List<Stream> streams = scraper.scrape(new URI(streamName));
         String latestSong = "";
-        for (Stream stream: streams){ //Iterates over mount points but will only return one song (assuming
+        for (Stream stream: streams){
             latestSong = stream.getCurrentSong();
         }
         return latestSong;

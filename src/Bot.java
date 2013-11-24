@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 public class Bot extends PircBot {
 
     private String nickname, server, channel;
+    private String sourceAddress = "https://github.com/paperziggurat/ghosthz-stream-bot";
 
     public Bot(String nick, String serv, String chan){
         nickname = nick;
@@ -40,11 +41,15 @@ public class Bot extends PircBot {
             try {
                 sendMessage(channel, stream.getListenerCount() + "");
             } catch (URISyntaxException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             } catch (ScrapeException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             }
 
+        }
+
+        if (message.equalsIgnoreCase("!source")){
+            sendMessage(channel, sourceAddress);
         }
     }
 
