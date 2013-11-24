@@ -47,22 +47,22 @@ public class StreamParser {
 
     public int getPeakListenerCount(){
         updateStream();
-        int listenerCount = 0;
+        int peakListenerCount = 0;
         for (Stream stream: streams){
-            listenerCount = listenerCount + stream.getCurrentListenerCount();
+            peakListenerCount = peakListenerCount + stream.getPeakListenerCount();
         }
 
-        return listenerCount;
+        return peakListenerCount;
     }
 
     public int getMaxListenerCount(){
         updateStream();
-        int listenerCount = 0;
+        int maxListenerCount = 0;
         for (Stream stream: streams){
-            listenerCount = listenerCount + stream.getCurrentListenerCount();
+            maxListenerCount = maxListenerCount + stream.getMaxListenerCount();
         }
 
-        return listenerCount;
+        return maxListenerCount;
     }
 
 }
