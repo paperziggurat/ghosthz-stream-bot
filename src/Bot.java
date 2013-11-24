@@ -1,6 +1,9 @@
 import net.moraleboost.streamscraper.ScrapeException;
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.PircBot;
+import org.jibble.pircbot.User;
+
+import java.util.ArrayList;
 import java.util.TimerTask;
 
 
@@ -37,9 +40,38 @@ public class Bot extends PircBot {
             sendMessage(channel, stream.getListenerCount() + "");
         }
 
+        if (message.equalsIgnoreCase("!peaklisteners")){
+            StreamParser stream = new StreamParser(streamAddress);
+            sendMessage(channel, stream.getPeakListenerCount() + "");
+        }
+
+        if (message.equalsIgnoreCase("!maxlisteners")){
+            StreamParser stream = new StreamParser(streamAddress);
+            sendMessage(channel, stream.getMaxListenerCount() + "");
+        }
+
         if (message.equalsIgnoreCase("!source")){
             sendMessage(channel, sourceAddress);
         }
+
+        if (message.contains("!kick") && isAuthentic(sender)){
+            String[] command = message.split(" ");
+            String userToKick = command[1];
+            kick(channel, userToKick);
+        }
+
+        if (message.contains("!deop") && isAuthentic(sender)){
+            String[] command = message.split(" ");
+            String userToDeOp = command[1];
+            kick(channel, userToDeOp);
+        }
+
+        if (message.contains("!op") && isAuthentic(sender)){
+            String[] command = message.split(" ");
+            String userToOp = command[1];
+            kick(channel, userToOp);
+        }
+
     }
 
     public void updateCurrentSong() throws URISyntaxException, ScrapeException {
@@ -49,4 +81,17 @@ public class Bot extends PircBot {
             sendMessage(channel, "Currently playing: " + currentlyPlaying);
         }
     }
+
+    private boolean isAuthentic(String nick){
+        User[] users = getUsers(channel);
+        for (User user: users){
+            if (user.getNick().equals(nick)){
+                if (user.isOp()){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }
