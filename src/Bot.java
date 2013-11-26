@@ -31,28 +31,32 @@ public class Bot extends PircBot {
     }
 
     public void onMessage(String channel, String sender, String login, String hostname, String message){
+        if (message.contains("!help")){
+            displayCommands(sender, message);
+        }
+
         if (message.equalsIgnoreCase("!song")){
             StreamParser stream = new StreamParser(streamAddress);
-            sendMessage(channel, "Currently Playing: " + stream.getSongTitle());
+            msg("Currently Playing: " + stream.getSongTitle());
         }
 
         if (message.equalsIgnoreCase("!listeners")){
             StreamParser stream = new StreamParser(streamAddress);
-            sendMessage(channel, stream.getListenerCount() + "");
+            msg(stream.getListenerCount() + "");
         }
 
         if (message.equalsIgnoreCase("!peaklisteners")){
             StreamParser stream = new StreamParser(streamAddress);
-            sendMessage(channel, stream.getPeakListenerCount() + "");
+            msg(stream.getPeakListenerCount() + "");
         }
 
         if (message.equalsIgnoreCase("!maxlisteners")){
             StreamParser stream = new StreamParser(streamAddress);
-            sendMessage(channel, stream.getMaxListenerCount() + "");
+            msg(stream.getMaxListenerCount() + "");
         }
 
         if (message.equalsIgnoreCase("!source")){
-            sendMessage(channel, sourceAddress);
+            msg(sourceAddress);
         }
 
         if (message.contains("!kick") && isAuthentic(sender)){
@@ -60,10 +64,10 @@ public class Bot extends PircBot {
             String userToKick = command[1];
             if (isUser(userToKick)){
                 kick(channel, userToKick);
-                sendMessage(channel, "Kicking " + userToKick + " from channel.");
+                msg("Kicking " + userToKick + " from channel.");
             }
             else {
-                sendMessage(channel, userToKick + " is not in the channel.");
+                msg(userToKick + " is not in the channel.");
             }
         }
 
@@ -71,11 +75,11 @@ public class Bot extends PircBot {
             String[] command = message.split(" ");
             String userToDeOp = command[1];
             if (isUser(userToDeOp)){
-                sendMessage(channel, "Removing operator privileges from " + userToDeOp + ".");
+                msg("Removing operator privileges from " + userToDeOp + ".");
                 deOp(channel, userToDeOp);
             }
             else {
-                sendMessage(channel, userToDeOp + " is not in the channel.");
+                msg(userToDeOp + " is not in the channel.");
             }
 
         }
@@ -84,22 +88,46 @@ public class Bot extends PircBot {
             String[] command = message.split(" ");
             String userToOp = command[1];
             if (isUser(userToOp)){
-                sendMessage(channel, "Granting operator privileges to " + userToOp + ".");
+                msg("Granting operator privileges to " + userToOp + ".");
                 op(channel, userToOp);
             }
             else {
-                sendMessage(channel, userToOp + " is not in the channel.");
+                msg(userToOp + " is not in the channel.");
             }
 
         }
 
     }
 
+    public void msg(String msg){
+        sendMessage(channel, msg);
+    }
+
+    public void pmsg(String sender, String msg){
+        sendMessage(sender, msg);
+    }
+
+    public void displayCommands(String sender, String helpRequest){
+        String[] message = helpRequest.split(" ");
+        if (message.length < 2){
+            pmsg(sender, "For help with op commands, enter !help op");
+            pmsg(sender, "For help with radio commands, enter !help radio");
+            pmsg(sender, "For help with weather commands, enter !help weather");
+        }
+        if (message[1].equals("op")){
+            pmsg(sender, "!kick [user]");
+            pmsg(sender, "!op [user]");
+            pmsg(sender, "!deop[user]");
+        }
+        if (message[1].equals("radio")){}
+        if (message[1].equals("weather")){}
+    }
+
     public void updateCurrentSong() throws URISyntaxException, ScrapeException {
         StreamParser stream = new StreamParser(streamAddress);
         if (!currentlyPlaying.equals(stream.getSongTitle())){
             currentlyPlaying = stream.getSongTitle();
-            sendMessage(channel, "Currently playing: " + currentlyPlaying);
+            //sendMessage(channel, "Currently playing: " + currentlyPlaying);
             setTopic(channel, "Currently playing: " + currentlyPlaying);
         }
 
