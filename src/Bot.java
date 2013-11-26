@@ -21,6 +21,7 @@ public class Bot extends PircBot {
         channel = chan;
         streamAddress = stream;
         sourceAddress = src;
+        currentlyPlaying = "";
     }
 
     public void connectBot() throws IrcException, IOException {
@@ -32,7 +33,7 @@ public class Bot extends PircBot {
     public void onMessage(String channel, String sender, String login, String hostname, String message){
         if (message.equalsIgnoreCase("!song")){
             StreamParser stream = new StreamParser(streamAddress);
-            sendMessage(channel, "Currently Playing:" + stream.getSongTitle());
+            sendMessage(channel, "Currently Playing: " + stream.getSongTitle());
         }
 
         if (message.equalsIgnoreCase("!listeners")){
@@ -57,19 +58,39 @@ public class Bot extends PircBot {
         if (message.contains("!kick") && isAuthentic(sender)){
             String[] command = message.split(" ");
             String userToKick = command[1];
-            kick(channel, userToKick);
+            if (isUser(userToKick)){
+                kick(channel, userToKick);
+                sendMessage(channel, "Kicking " + userToKick + " from channel.");
+            }
+            else {
+                sendMessage(channel, userToKick + " is not in the channel.");
+            }
         }
 
         if (message.contains("!deop") && isAuthentic(sender)){
             String[] command = message.split(" ");
             String userToDeOp = command[1];
-            kick(channel, userToDeOp);
+            if (isUser(userToDeOp)){
+                sendMessage(channel, "Removing operator privileges from " + userToDeOp + ".");
+                deOp(channel, userToDeOp);
+            }
+            else {
+                sendMessage(channel, userToDeOp + " is not in the channel.");
+            }
+
         }
 
         if (message.contains("!op") && isAuthentic(sender)){
             String[] command = message.split(" ");
             String userToOp = command[1];
-            kick(channel, userToOp);
+            if (isUser(userToOp)){
+                sendMessage(channel, "Granting operator privileges to " + userToOp + ".");
+                op(channel, userToOp);
+            }
+            else {
+                sendMessage(channel, userToOp + " is not in the channel.");
+            }
+
         }
 
     }
@@ -79,7 +100,9 @@ public class Bot extends PircBot {
         if (!currentlyPlaying.equals(stream.getSongTitle())){
             currentlyPlaying = stream.getSongTitle();
             sendMessage(channel, "Currently playing: " + currentlyPlaying);
+            setTopic(channel, "Currently playing: " + currentlyPlaying);
         }
+
     }
 
     private boolean isAuthentic(String nick){
@@ -89,6 +112,16 @@ public class Bot extends PircBot {
                 if (user.isOp()){
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    private boolean isUser(String nick){
+        User[] users = getUsers(channel);
+        for (User user: users){
+            if (user.getNick().equals(nick)){
+                return true;
             }
         }
         return false;
